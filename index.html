@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en" data-framework="javascript">
+
+<head>
+  <meta charset="utf-8" />
+  <title>VanillaJS • TodoMVC</title>
+  <link rel="stylesheet" href="base.css" />
+  <link rel="stylesheet" href="index.css" />
+</head>
+
+<body>
+  <section class="todoapp">
+    <header class="header">
+      <h1>todos</h1>
+      <input class="new-todo" placeholder="What needs to be done?" autofocus="" />
+    </header>
+    <section class="main">
+      <input id="toggle-all" class="toggle-all" type="checkbox" />
+      <label for="toggle-all">Mark all as complete</label>
+      <ul class="todo-list">
+        <!-- <li class="editing">
+          <div class="view">
+            <input class="toggle" type="checkbox" checked="" /><label>Be awesome</label><button
+              class="destroy"></button>
+          </div>
+          <input class="edit" value="Be awesome" />
+        </li>
+
+        <li class="">
+          <div class="view">
+            <input class="toggle" type="checkbox" /><label>Be awesome</label><button class="destroy"></button>
+          </div>
+          <input class="edit" value="Be awesome" />
+        </li>
+
+        <li class="completed">
+          <div class="view">
+            <input class="toggle" type="checkbox" checked="" /><label>Be awesome</label><button
+              class="destroy"></button>
+          </div>
+          <input class="edit" value="Be awesome" />
+        </li> -->
+      </ul>
+    </section>
+    <footer class="footer">
+      <span class="todo-count"></span>
+      <ul class="filters">
+        <li>
+          <a href="#/" class="selected">All</a>
+        </li>
+        <li>
+          <a href="#/active">Active</a>
+        </li>
+        <li>
+          <a href="#/completed">Completed</a>
+        </li>
+      </ul>
+      <button class="clear-completed">Clear completed</button>
+    </footer>
+  </section>
+  <footer class="info">
+    <p>Double-click to edit a todo</p>
+    <p>
+      Created by <a href="http://twitter.com/oscargodson">Oscar Godson</a>
+    </p>
+    <p>
+      Refactored by
+      <a href="https://github.com/cburgmer">Christoph Burgmer</a>
+    </p>
+    <p>Part of <a href="http://todomvc.com">TodoMVC</a></p>
+  </footer>
+
+  <script>
+    const liToEdit = document.querySelector('.todo-list')
+    const addMoreToDoNode = document.querySelector('.new-todo')
+    const tasksPromise = () => fetch('tasks.json').then(response => response.json()).then(data => data.tasks);
+
+
+    const refreshTasks = () => Promise.all([tasksPromise()]).then(([tasks]) => {
+      liToEdit.innerHTML = '';
+      tasks.forEach(task => {
+        const liNode = document.createElement('li')
+        const divNode = document.createElement('div')
+        const inputNode = document.createElement('input')
+        const inputNodeInside = document.createElement('input')
+        const inputLabel = document.createElement('label')
+        const btn = document.createElement('button')
+
+        divNode.classList.add('view')
+        inputNode.classList.add('edit')
+        inputNode.setAttribute('value', task.title)
+        inputNodeInside.classList.add('toggle')
+        inputNodeInside.setAttribute('type', 'checkbox')
+        inputNodeInside.setAttribute('value', task.id)
+        // inputNodeInside.addEventListener('click', completed)
+        btn.classList.add('destroy')
+        btn.setAttribute('data-task-id', task.id)
+        inputLabel.textContent = task.title
+
+        liToEdit.appendChild(liNode)
+        liNode.appendChild(divNode)
+        liNode.appendChild(inputNode)
+        divNode.appendChild(inputNodeInside)
+        divNode.appendChild(inputLabel)
+        divNode.appendChild(btn)
+        if (task.isDone) {
+          inputNodeInside.setAttribute('checked', '')
+          liNode.classList.add('completed')
+        }
+      })
+    })
+    refreshTasks()
+    const addNewTask = task =>
+      fetch("http://localhost:3000/tasks", {
+        method: 'POST',
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(task)
+      })
+
+    addMoreToDoNode.addEventListener('keyup', function (event) {
+      if (event.code === 'Enter') {
+        const task = {};
+        task.title = event.target.value
+        event.target.value = ""
+        console.log(task)
+        task.isDone = false
+        addNewTask(task).then(() => refreshTasks())
+      }
+    })
+
+    const updateTask = (taskId, isDone) => 
+    fetch(`http://localhost:3000/tasks/${taskId}`, {
+      method: 'PATCH',
+      headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({isDone: isDone})
+    })
+
+    const deleteTask = (taskId) => 
+    fetch(`http://localhost:3000/tasks/${taskId}`, {
+      method: 'DELETE',
+      headers: {
+          "Content-Type": "application/json",
+        },
+    })
+
+    liToEdit.addEventListener('click', function(event){
+      if(event.target.classList.contains('destroy')){
+        const taskId = event.target.getAttribute('data-task-id');
+        deleteTask(taskId).then(() => refreshTasks())
+      }
+    })
+
+    liToEdit.addEventListener('change', function (event){
+      if(event.target.classList.contains('toggle')){
+        const checkboxIsChecked = event.target.checked;
+        const taskId = event.target.value;
+        updateTask(taskId, checkboxIsChecked).then(() => refreshTasks())
+      }
+    })
+
+
+
+
+  </script>
+</body>
+
+</html>

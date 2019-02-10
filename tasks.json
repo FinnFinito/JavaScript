@@ -1,0 +1,24 @@
+{
+  "tasks": [
+    {
+      "title": "New one",
+      "isDone": false,
+      "id": 1
+    },
+    {
+      "title": "Another",
+      "isDone": false,
+      "id": 2
+    },
+    {
+      "title": "Another one",
+      "isDone": false,
+      "id": 3
+    },
+    {
+      "title": "And another",
+      "isDone": false,
+      "id": 4
+    }
+  ]
+}
