@@ -1,0 +1,5 @@
+"use strict";
+
+play();
+
+play();
