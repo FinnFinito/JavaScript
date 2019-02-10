@@ -1,2 +1,2 @@
 # JavaScript
-JavaScript learning
+MY JavaScript projects during Front-end developer course
